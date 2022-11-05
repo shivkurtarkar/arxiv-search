@@ -1,0 +1,8 @@
+tensorflow
+tensorboard
+torch
+pandas
+numpy
+transformers
+matplotlib
+tensorflow_datasets
