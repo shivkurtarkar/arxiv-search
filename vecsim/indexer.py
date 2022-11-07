@@ -15,13 +15,14 @@ from redis.commands.search.field import (
     NumericField,
     TextField
 )
-from redis.asyncio import Redis
+import redis.asyncio as redis
 from redis.commands.search.query import Query
 from redis.commands.search.indexDefinition import IndexDefinition, IndexType
 from redis.commands.search.field import VectorField
 from typing import Optional, Pattern
 
-        
+import config
+
 # read docs
 # preprocess
 # add to redis
@@ -99,16 +100,20 @@ class ColBERTFormator:
         return fields
     
 class RedisIndexer():
-    def __init__(self, index_name, host="redis", port="6379", n=50):
+    def __init__(self, index_name, host="redis", port="6379", url=None, n=50):
         self.redis_conn=None        
         self.semaphore = asyncio.Semaphore(n)
+        self.url = url
         self.host = host
         self.port = port
         self.index_name=index_name
 
     async def init_redis(self):
         if self.redis_conn is None:
-            self.redis_conn = await Redis(host=self.host, port=self.port)
+            if url is not None:
+                self.redis_conn = await redis.from_url(self.url)
+            else:
+                self.redis_conn = await redis.Redis(host=self.host, port=self.port)
             
     async def write(self, data):
         if type(data) != list:            
@@ -140,7 +145,7 @@ class RedisIndexer():
         
 async def main(filename):
     docs_source = DocumentSource(filename)
-    indexer = RedisIndexer(index_name="doc")
+    indexer = RedisIndexer(index_name="doc", url=config.REDIS_URL)
     await indexer.init_redis()
     
     model = ColBERTModel()
