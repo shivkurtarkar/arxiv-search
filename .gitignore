@@ -7,3 +7,6 @@ logs-final
 
 # data
 data
+
+aenv
+env_export.sh
