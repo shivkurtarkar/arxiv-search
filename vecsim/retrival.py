@@ -172,6 +172,7 @@ async def main():
 
     model = ColBERTModel()
     
+    ## search
     aggregator = []
     for query in query_source.read():
         embedding = model.compute_query_representation(query)        
@@ -197,6 +198,8 @@ async def main():
     #         for doc_id in doc_ids]
     # print(f"doc_ids: {doc_ids}")
     # print(f"doc_ids: {docs}")
+    
+    ## Ranking
     print(list(uniq_docs.values())[0]["doc"])
     # reranker = Reranker()
     late_interaction_ranking = []
@@ -211,8 +214,8 @@ async def main():
     )
 
 #     reranker.render()
+    ## render
     print(late_interaction_ranking)
-
     print([
         (each["doc_id"], each["late_interaction_score"] , each["doc"])
         for each in late_interaction_ranking
@@ -231,7 +234,8 @@ async def main():
     #     )
     #     sink.write(rendered_image)
     # sink.serve()
-
+    
+    ## explainability
     for each in late_interaction_ranking:
         score_map, doc_tokens, query_tokens = model.compute_interaction_map(
             query, each["doc"]
