@@ -37,14 +37,10 @@ class DocumentSource:
             df = pickle.load(file)
         return df
 
-    def _preprocess(self, df):
-        df['input'] = df.apply(lambda r: r.title + r.abstract, axis=1)
-        df.reset_index(drop=True, inplace=True)
-        return df
-        
+       
     def read(self, sample_frac=None, limit=None):
         df = self._read_paper_df()
-        df = self._preprocess(df)
+        df.reset_index(drop=True, inplace=True)
         if sample_frac:
             df = df.sample(frac=sample_frac)
         docs = df.input.to_list()
@@ -143,6 +139,14 @@ class RedisIndexer():
             definition= IndexDefinition(prefix=[prefix], index_type=IndexType.HASH)
         )
         
+# def preprocess(df):
+#     df['input'] = df.apply(lambda r: r.title + r.abstract, axis=1)
+#     df.reset_index(drop=True, inplace=True)
+#     return df
+
+def preprocess(r):
+    return r.title + r.abstract
+
 async def main(filename):
     docs_source = DocumentSource(filename)
     indexer = RedisIndexer(index_name="doc", url=config.REDIS_URL)
@@ -153,6 +157,7 @@ async def main(filename):
     
     for i,data in enumerate(docs_source.read(sample_frac=0.1)):
         # print(f"{i} data: {data}")
+        data = preprocess(data)
         embeddings = model.compute_document_representation(data)
         # print(f"{i} data: {embeddings}")
         docs = formator.create_formating(i, embeddings, data)
