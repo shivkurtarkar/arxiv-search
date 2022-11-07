@@ -26,67 +26,6 @@ from redis.commands.search.field import VectorField
 from typing import Optional, Pattern
 
 
-# class SearchIndex:
-#     def __init__(self,index_name:str, redis_conn:Redis):
-#         self.index_name = index_name
-#         self.redis_conn = redis_conn
-#     async def create(
-#         self,
-#         *fields,
-#         prefix: str
-#     ):
-#         await self.redis_conn.ft(self.index_name).create_index(
-#             fields = fields,
-#             definition = IndexDefinition([prefix], index_type=IndexType.HASH)
-#         )
-#     async def delete(self):
-#         await self.redis_conn.ft(self.index_name).dropindex(delete_documents=True)
-
-#     def vector_query(
-#         self,
-#         search_type: str="KNN",
-#         number_of_results: int=20
-#     ) -> Query:
-#         """
-#         Create a RediSearch query to perform hybrid vector and tag based searches.
-
-
-#         Args:
-#             categories (list): List of categories.
-#             years (list): List of years.
-#             search_type (str, optional): Style of search. Defaults to "KNN".
-#             number_of_results (int, optional): How many results to fetch. Defaults to 20.
-
-#         Returns:
-#             Query: RediSearch Query
-
-#         """
-#         # Parse tags to create query
-#         tag_query = '*'
-#         base_query = f'{tag_query}=>[{search_type} {number_of_results} @vector $vec_param AS vector_score]'
-#         print(base_query)
-#         return Query(base_query)\
-#             .sort_by("vector_score")\
-#             .paging(0, number_of_results)\
-#             .return_fields("doc_id", "doc", "vector_score")\
-#             .dialect(2)
-
-    
-        
-# class Retriver:
-#     def __init__(self, indexer):
-#         self.redis_indexer =indexer
-
-#     def retrive(self, query):
-#         query_emb = None
-#         query_vecs = None
-        
-#         # for each in query_vecs 
-#         #    search n similar vecs
-#         # get uniq doc ids
-#         # rerank docs
-
-
 #  Query preprocessing
 #  Search n vectors
 #  Get docs

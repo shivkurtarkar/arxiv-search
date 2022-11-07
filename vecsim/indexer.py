@@ -21,74 +21,11 @@ from redis.commands.search.indexDefinition import IndexDefinition, IndexType
 from redis.commands.search.field import VectorField
 from typing import Optional, Pattern
 
-# class Indexer:
-#     def __init__(self, key_prefix='doc'):
-#         self.model = get_model()
-#         self.tokenizer = get_tokenizer()
-#         self.redis_conn = None
-#         n=50
-#         self.semaphore = asyncio.Semaphore(n)
-#         self.key_prefix = key_prefix
-    
-#     def get_key(self, key):
-#         return f'{self.key_prefix}:{key}'
-
-#     async def _init_redis(self):
-#         if self.redis_conn is None:
-#             self.redis_conn = await Redis(host="redis", port="6379")
-        
-#     async def index(self, docs):
-#         await self._init_redis()
-#         print(f'total docs: {len(docs)}')
-#         for i,doc in enumerate(tqdm(docs)):
-#             # print(f'processing: {i}')
-#             try:
-#                 await self._index_doc(i, doc)
-#             except Exception as e:
-#                 print(f'processing: {i}')
-#                 print('error', e)
-        
-#     async def _index_doc(self, doc_id, doc):        
-#         # print(doc)
-#         doc_emb = self.tokenizer(doc, return_tensors="pt")
-#         # print(doc_emb.input_ids.shape)
-#         doc_vecs = self.model.forward_representation(doc_emb).squeeze(0)
-#         doc_vecs = doc_vecs.cpu().detach().numpy()
-#         # print('vector type', type(doc_vecs))
-        
-#         # Index doc_vecs into redis        
-#         for i, doc_vec in enumerate(doc_vecs):
-#             doc_vec = doc_vec.astype(np.float32)
-#             # print(f'doc vec shape: {doc_vec.shape}')
-#             # print('doc_vec ',doc_vec)
-#             doc_vec = doc_vec.tobytes()
-            
-#             doc_details = {
-#                 'vector': doc_vec,
-#                 'doc': doc,
-#                 'doc_id':doc_id
-#             }
-#             # print(doc_details)
-#             await self._index_doc_vec(self.get_key(f'{doc_id}-{i}'), doc_details)
-    
-#     async def _index_doc_vec(self, key, doc_details):
-#         async with self.semaphore:
-#             await self.redis_conn.hset(key, mapping=doc_details)
-    
-#     async def print_db_size(self):
-#         print(await self.redis_conn.dbsize()) 
-        
         
 # read docs
 # preprocess
 # add to redis
 # create index
-
-# class Indexer:
-#     def __init__(self):
-#         pass
-#     def write(self, embeddings):
-#         pass
     
 class DocumentSource:
     def __init__(self, filename):
