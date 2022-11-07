@@ -6,3 +6,4 @@ aiofiles
 redis-om
 pandas
 sentence-transformers
+# matplotlib
