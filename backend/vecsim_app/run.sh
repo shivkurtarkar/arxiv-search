@@ -4,10 +4,10 @@ cd ${SCRIPT_DIR}
 echo pwd
 
 
-# uvicorn main:app --reload
+uvicorn main:app --reload
 
 #!/bin/sh
 
-python load_data.py
+# python load_data.py
 
-python main.py
+# python main.py
