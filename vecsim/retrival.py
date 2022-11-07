@@ -192,49 +192,26 @@ async def main():
                     "doc": doc.doc,
                     "vector_matrix": doc.vector_matrix
                 }
-    
-    
-    # docs = [await indexer.fetch_one(retriver.get_key(f"{doc_id}-1"), "doc")
-    #         for doc_id in doc_ids]
-    # print(f"doc_ids: {doc_ids}")
-    # print(f"doc_ids: {docs}")
-    
+        
     ## Ranking
-    print(list(uniq_docs.values())[0]["doc"])
-    # reranker = Reranker()
+    print(list(uniq_docs.values())[0]["doc"])    
     late_interaction_ranking = []
     for each in uniq_docs.values():
         score = model.compute_score(query, each["doc"])
         each["late_interaction_score"] = score
         late_interaction_ranking.append(each)
 #         reranker.write(score, doc)
-#     reranker.rank()
     late_interaction_ranking.sort(
         key=lambda x: x["late_interaction_score"]
     )
 
-#     reranker.render()
     ## render
     print(late_interaction_ranking)
     print([
         (each["doc_id"], each["late_interaction_score"] , each["doc"])
         for each in late_interaction_ranking
     ])    
-    
-    # source = Source(Doc, Query)
-    # sink =[]
-    # for doc,query in source:
-    #     interaction_map = model.compute_interaction(score,doc)
-    #     query_tokens = get_tokens(query)
-    #     doc_tokens = get_tokens(doc)
-    #     rendered_image = render_image(
-    #         interaction_map, 
-    #         query_tokens, 
-    #         doc_tokens
-    #     )
-    #     sink.write(rendered_image)
-    # sink.serve()
-    
+        
     ## explainability
     for each in late_interaction_ranking:
         score_map, doc_tokens, query_tokens = model.compute_interaction_map(
