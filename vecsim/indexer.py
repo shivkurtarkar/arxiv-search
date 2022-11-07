@@ -1,4 +1,6 @@
 from model import get_tokenizer, get_model
+import re
+import string
 ##
 import asyncio
 
@@ -49,26 +51,38 @@ class DocumentSource:
         return docs
 
 class ColBERTFormator:    
-    def __init__(self, prefix):
-        self.prefix = prefix
+    def __init__(self, doc_prefix, vec_prefix):
+        self.doc_prefix = doc_prefix
+        self.vec_prefix = vec_prefix
 
-    def get_key(self, key):
-        return f"{self.prefix}:{key}"    
+    def get_doc_key(self, key):
+        return f"{self.doc_prefix}:{key}"
+    def get_vec_key(self, key):
+        return f"{self.vec_prefix}:{key}"
 
-    def create_formating(self, doc_id, vecs, data):
+    def create_doc_formatting(self, doc_id,vecs, data):
         vecs = vecs.astype(np.float32)
-        vecs_bytes = vecs.tobytes()        
+        vecs_bytes = vecs.tobytes()
+        docs = []        
+        key = self.get_doc_key(f'{doc_id}')        
+        doc = {
+            'id': key,
+            'doc_id': str(doc_id),
+            'doc': data,
+            'vector_matrix': vecs_bytes
+        }
+        docs.append(doc)
+        return docs
+    def create_vec_formatting(self, doc_id, vecs):        
         docs = []
         for vec_id, vec in enumerate(vecs):
-            key = self.get_key(f'{doc_id}-{vec_id}')
+            key = self.get_vec_key(f'{doc_id}-{vec_id}')
             vec_bytes = vec.tobytes()
             doc = {
                 'id': key,
                 'doc_id': str(doc_id),
                 'vec_id': str(vec_id),
-                'doc': data,
-                'vector': vec_bytes,
-                'vector_matrix': vecs_bytes
+                'vector': vec_bytes
             }
             docs.append(doc)
         return docs
@@ -86,7 +100,7 @@ class ColBERTFormator:
         )
         doc_id = TagField("doc_id")
         vec_id = TagField("vec_id")
-        doc = TagField("doc")
+        # doc = TagField("doc")
         fields = [
             vector_field,
             doc_id,
@@ -106,7 +120,7 @@ class RedisIndexer():
 
     async def init_redis(self):
         if self.redis_conn is None:
-            if url is not None:
+            if self.url is not None:
                 self.redis_conn = await redis.from_url(self.url)
             else:
                 self.redis_conn = await redis.Redis(host=self.host, port=self.port)
@@ -114,7 +128,7 @@ class RedisIndexer():
     async def write(self, data):
         if type(data) != list:            
             data = [data]
-        for data_elem in data:
+        for data_elem in tqdm(data):
             # print(data_elem)
             await self.__write_to_redis(data_elem['id'], data_elem)
 

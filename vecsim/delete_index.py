@@ -5,7 +5,7 @@ import config
 
 # Delete all
 async def delete_all(redis_conn):
-    async for key in redis_conn.scan_iter("*"):
+    async for key in redis_conn.scan_iter("doc:*"):
         print(key)
         await redis_conn.delete(key)
     print("db size: ", await redis_conn.dbsize())
@@ -17,4 +17,4 @@ async def main():
 
 
 if __name__ == '__main__':
-    asyncio.run(main)
+    asyncio.run(main())

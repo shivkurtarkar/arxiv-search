@@ -1,12 +1,12 @@
 import re
 
-from redis.asyncio import Redis
+import redis.asyncio as redis
 from redis.commands.search.query import Query
 from redis.commands.search.indexDefinition import IndexDefinition, IndexType
 from redis.commands.search.field import VectorField
 from typing import Optional, Pattern
 
-
+import config
 
 ##
 import numpy as np
@@ -37,17 +37,22 @@ from typing import Optional, Pattern
 #  Dotproduct
 #  convert to image and plot
 
-class RedisIndexer():
-    def __init__(self, index_name, host="redis", port="6379", n=50):
+class RedisIndexer():        
+    def __init__(self, index_name, host="redis", port="6379", url=None, n=50):
         self.redis_conn=None        
         self.semaphore = asyncio.Semaphore(n)
+        self.url = url
         self.host = host
         self.port = port
         self.index_name=index_name
 
     async def init_redis(self):
         if self.redis_conn is None:
-            self.redis_conn = await Redis(host=self.host, port=self.port)
+            if self.url is not None:
+                self.redis_conn = await redis.from_url(self.url)
+            else:
+                self.redis_conn = await redis.Redis(host=self.host, port=self.port)
+            
             
     async def write(self, data):
         if type(data) != list:            
@@ -93,7 +98,7 @@ class RedisIndexer():
         return Query(base_query)\
             .sort_by("vector_score")\
             .paging(0, number_of_results)\
-            .return_fields("doc_id", "doc", "vector_matrix", "vector_score")\
+            .return_fields("doc_id", "vector_score")\
             .dialect(2)
     async def search(self, query_vec, k = 5):
         query_vec = query_vec.astype(np.float32)
@@ -167,7 +172,7 @@ def get_interaction_image(scores, doc_tokens, query_tokens):
 async def main():
     query_source = QuerySource()
     
-    indexer = RedisIndexer(index_name="doc")
+    indexer = RedisIndexer(index_name="doc_vec", url=config.REDIS_URL)
     await indexer.init_redis()
 
     model = ColBERTModel()
@@ -180,23 +185,33 @@ async def main():
         aggregator.extend(results)
     # print(aggregator)
     
-    retriver = Retriver(prefix="doc")
+    # retriver = Retriver(prefix="doc_vec")
         
-    uniq_docs={}
+    uniq_doc_ids=[]
     for result in aggregator:
         # print(result)
         for doc in result.docs:
-            if doc.doc_id not in uniq_docs.keys():
-                uniq_docs[doc.doc_id] = {
-                    "doc_id": doc.doc_id,
-                    "doc": doc.doc,
-                    "vector_matrix": doc.vector_matrix
-                }
-        
+            uniq_doc_ids.append(doc.doc_id)
+    uniq_doc_ids = list(set(uniq_doc_ids))
+    print("uniq_doc_ids:", uniq_doc_ids)
+    print("uniq_doc_ids len:", len(uniq_doc_ids))
+    
+    ## Retrival
+    uniq_docs = []
+    for doc_id in uniq_doc_ids[:10]:
+        key = f'paper:{doc_id}'
+        doc = await indexer.fetch_one(key, field="doc")
+        uniq_docs.append({
+            "doc_id": doc_id,
+            "doc": doc
+        })
+    print("uniq_docs len : ", len(uniq_docs))
+
     ## Ranking
-    print(list(uniq_docs.values())[0]["doc"])    
+    # print(list(uniq_docs.values())[0]["doc"])
+
     late_interaction_ranking = []
-    for each in uniq_docs.values():
+    for each in uniq_docs:
         score = model.compute_score(query, each["doc"])
         each["late_interaction_score"] = score
         late_interaction_ranking.append(each)
@@ -229,7 +244,3 @@ if __name__ == '__main__':
     asyncio.run(
         main()
     )
-    
-    
-    
-    

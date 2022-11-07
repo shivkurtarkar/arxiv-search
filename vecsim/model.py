@@ -35,10 +35,10 @@ class ColBERTModel:
     
     def _preprocess_query(self, data):
         query_input = self.tokenizer(data, return_tensors="pt").to(self.device)
-        query_input.input_ids += [103] * 8 # [MASK]
-        query_input.attention_mask += [1] * 8
-        query_input["input_ids"] = torch.LongTensor(query_input.input_ids).unsqueeze(0)
-        query_input["attention_mask"] = torch.LongTensor(query_input.attention_mask).unsqueeze(0)
+        # query_input.input_ids += [103] * 8 # [MASK]
+        # query_input.attention_mask += [1] * 8
+        # query_input["input_ids"] = torch.LongTensor(query_input.input_ids).unsqueeze(0)
+        # query_input["attention_mask"] = torch.LongTensor(query_input.attention_mask).unsqueeze(0)
         return query_input
 
     def _preprocess_document(self, data):
@@ -90,7 +90,7 @@ class ColBERTModel:
         
     def compute_interaction_map(self, query, data):
         doc_input = self._preprocess_document(data)        
-        query_input = self._preprocess_query(query)
+        query_input = self._preprocess_document(query)
         
         query_vecs = self.model.forward_representation(query_input)
         doc_vecs = self.model.forward_representation(doc_input)
@@ -99,8 +99,8 @@ class ColBERTModel:
         # print(doc_input.input_ids.shape)
         # print(doc_input.input_ids.numpy()[0].shape)
         # print(type(query_input.input_ids))
-        doc_tokens = self.tokenizer.convert_ids_to_tokens(doc_input.input_ids.numpy()[0])
-        query_tokens = self.tokenizer.convert_ids_to_tokens(query_input.input_ids)
+        doc_tokens = self.tokenizer.convert_ids_to_tokens(doc_input.input_ids[0])
+        query_tokens = self.tokenizer.convert_ids_to_tokens(query_input.input_ids.squeeze(0))
         print(doc_tokens)
         print(query_tokens)
         score = score.squeeze(0).cpu().detach().numpy()
