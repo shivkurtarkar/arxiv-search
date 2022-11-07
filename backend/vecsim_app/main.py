@@ -10,30 +10,32 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from vecsim_app import config
-from vecsim_app import Paper
+from vecsim_app.models import Paper
 from vecsim_app.api import routes
 from vecsim_app.spa import SinglePageApplication
 
+
 app = FastAPI(
     title=config.PROJECT_NAME,
-    docs_url = config.API_DOCS,
-    openapi_url = config.OPENAPI_DOCS
+    docs_url=config.API_DOCS,
+    openapi_url=config.OPENAPI_DOCS
 )
 
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins='*',
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"]
+        CORSMiddleware,
+        allow_origins="*",
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"]
 )
 
-# Routes
+# Routers
 app.include_router(
-    routes.paper_route,
-    prefix=config.API_V1_STR+"/paper",
+    routes.paper_router,
+    prefix=config.API_V1_STR + "/paper",
     tags=["papers"]
 )
+
 
 @app.on_event("startup")
 async def startup():
@@ -46,7 +48,7 @@ async def startup():
 # static image files
 app.mount("/data", StaticFiles(directory="data"), name="data")
 
-# mount the built GUI react files into the static dir to be served.
+## mount the built GUI react files into the static dir to be served.
 current_file = Path(__file__)
 project_root = current_file.parent.resolve()
 gui_build_dir = project_root / "templates" / "build"

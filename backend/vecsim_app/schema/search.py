@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 class SimilarityRequest(BaseModel):
     paper_id: str
     categories: list
