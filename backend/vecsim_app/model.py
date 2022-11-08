@@ -101,8 +101,8 @@ class ColBERTModel:
         # print(type(query_input.input_ids))
         doc_tokens = self.tokenizer.convert_ids_to_tokens(doc_input.input_ids[0])
         query_tokens = self.tokenizer.convert_ids_to_tokens(query_input.input_ids.squeeze(0))
-        print(doc_tokens)
-        print(query_tokens)
+        # print(doc_tokens)
+        # print(query_tokens)
         score = score.squeeze(0).cpu().detach().numpy()
         return score, doc_tokens, query_tokens
     
@@ -120,12 +120,12 @@ class ColBERTModel:
             query_input["attention_mask"],
             passage_input["attention_mask"]
         )
-        print(f_score)
+        # print(f_score)
 
         scores = torch.bmm(query_vecs,document_vecs.transpose(2,1))
 
         (x_shape, y_shape) = scores.squeeze(0).shape
-        print(x_shape, y_shape)
+        # print(x_shape, y_shape)
 
         plt.matshow(
           scores.squeeze(0).cpu().detach().numpy()

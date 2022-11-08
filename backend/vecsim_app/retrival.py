@@ -51,7 +51,7 @@ async def gather_with_concurrency(redis_conn, *doc_ids, field=None):
             # else:
             #     fetched = await redis_conn.hgetall(key)
         return {
-            "doc_id": doc_id,
+            "paper_id": doc_id,
             "doc": fetched
         }            
     # gather with concurrency
@@ -184,10 +184,10 @@ def get_interaction_image(scores, doc_tokens, query_tokens):
     plt.tight_layout()
     
     imageIObytes = io.BytesIO()
-    plt.savefig(imageIObytes, format='jpg', bbox_inches='tight')
+    plt.savefig(imageIObytes, format='png', bbox_inches='tight')
     imageIObytes.seek(0)
-    plt_base64_jpgData = base64.b64encode(imageIObytes.read())
-    return plt_base64_jpgData
+    # plt_base64_jpgData = base64.b64encode(imageIObytes.read())
+    return imageIObytes
 
 
 async def main():

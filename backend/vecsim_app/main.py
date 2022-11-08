@@ -10,9 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from vecsim_app import config
-from vecsim_app.models import Paper
 from vecsim_app.api import routes
-from vecsim_app.spa import SinglePageApplication
 
 
 app = FastAPI(
@@ -37,24 +35,16 @@ app.include_router(
 )
 
 
-@app.on_event("startup")
-async def startup():
+# @app.on_event("startup")
+# async def startup():
     # You can set the Redis OM URL using the REDIS_OM_URL environment
     # variable, or by manually creating the connection using your model's
     # Meta object.
-    Paper.Meta.database = get_redis_connection(url=config.REDIS_URL, decode_responses=True)
-    await Migrator().run()
+    # Paper.Meta.database = get_redis_connection(url=config.REDIS_URL, decode_responses=True)
+    # await Migrator().run()
 
 # static image files
 app.mount("/data", StaticFiles(directory="data"), name="data")
-
-# ## mount the built GUI react files into the static dir to be served.
-# current_file = Path(__file__)
-# project_root = current_file.parent.resolve()
-# gui_build_dir = project_root / "templates" / "build"
-# app.mount(
-#     path="/", app=SinglePageApplication(directory=gui_build_dir), name="SPA"
-# )
 
 if __name__ == "__main__":
     import os
