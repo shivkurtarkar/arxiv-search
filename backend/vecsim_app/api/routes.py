@@ -63,8 +63,7 @@ async def get_papers(
 @r.post("/vectorsearch/text", response_model=t.Dict)
 async def find_papers_by_user_text(similarity_request: UserTextSimilarityRequest):
     limit=similarity_request.number_of_results
-    run_cpu =True
-
+    
     indexer = RedisIndexer(index_name="doc_vec", url=config.REDIS_URL)
     await indexer.init_redis()
     model = ColBERTModel()
@@ -89,8 +88,7 @@ async def find_papers_by_user_text(similarity_request: UserTextSimilarityRequest
     ## Retrival
     uniq_docs = await gather_with_concurrency(indexer.redis_conn, *uniq_doc_ids, field='doc')
     uniq_docs =[ doc for doc in uniq_docs if doc["doc"] is not None]
-    if run_cpu :
-        uniq_docs= uniq_docs[:limit]
+    
     ## Ranking
     late_interaction_ranking = []
     for each in uniq_docs:    
