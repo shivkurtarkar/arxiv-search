@@ -44,7 +44,7 @@ app.include_router(
     # await Migrator().run()
 
 # static image files
-app.mount("/data", StaticFiles(directory="data"), name="data")
+# app.mount("/data", StaticFiles(directory="data"), name="data")
 
 if __name__ == "__main__":
     import os
