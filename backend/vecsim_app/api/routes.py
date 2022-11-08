@@ -49,7 +49,8 @@ async def get_papers(
         late_interaction_ranking.append(each)
     #         reranker.write(score, doc)
     late_interaction_ranking.sort(
-        key=lambda x: x["late_interaction_score"]
+        key=lambda x: x["late_interaction_score"],
+        reverse=True
     )
 
     # obtain results of the queries
@@ -98,7 +99,8 @@ async def find_papers_by_user_text(similarity_request: UserTextSimilarityRequest
         late_interaction_ranking.append(each)
     #         reranker.write(score, doc)
     late_interaction_ranking.sort(
-        key=lambda x: x["late_interaction_score"]
+        key=lambda x: x["late_interaction_score"],
+        reverse=True
     )
 
     # limit entries returned back
@@ -152,7 +154,8 @@ async def find_papers_by_user_text(similarity_request: UserTextSimilarityExplain
         late_interaction_ranking.append(each)
     #         reranker.write(score, doc)
     late_interaction_ranking.sort(
-        key=lambda x: x["late_interaction_score"]
+        key=lambda x: x["late_interaction_score"],
+        reverse=True
     )
 
     ## explainability
