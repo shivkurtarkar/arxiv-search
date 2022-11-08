@@ -1,6 +1,6 @@
-version: '3'
+version: '3.7'
 services:
-  redis:
+  redis-vector-db:
     build:
       context: ./redis-vector-db
       dockerfile: Dockerfile
@@ -9,12 +9,22 @@ services:
     ports:
       - 6379:6379
       - 8001:8001
-  jupyter:
-    image: jupyter/minimal-notebook:latest
-    container_name: jupyter
-    volumes:
-      - ./vecsim:/home/jovyan/vecsim
-    ports:
-      - 8888:8888
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
     environment:
-      JUPYTER_ENABLE_LAB: "yes"
+      DEPLOYMENT: "dev"
+      REDIS_HOST: "redis-vector-db"
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: "testing123"
+      REDIS_DB: 0
+    expose:
+      - "8888"
+    ports:
+      - "8888:8888"
+    depends_on:
+      - "redis-vector-db"
+
+volumes:
+  redis-vector-db:
