@@ -53,7 +53,7 @@ if __name__ == "__main__":
     server_attr = {
         "host": "0.0.0.0",
         "reload": True,
-        "port": 8888,
+        "port": 8000,
         "workers": 1
     }
     if env == "prod":
