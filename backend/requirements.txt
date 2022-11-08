@@ -5,5 +5,6 @@ requests
 aiofiles
 redis-om
 pandas
-sentence-transformers
-# matplotlib
+torch
+transformers
+matplotlib
